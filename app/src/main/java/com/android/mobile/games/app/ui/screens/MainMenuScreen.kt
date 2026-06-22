@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -34,6 +35,7 @@ private val DarkCard   = Color(0xFF1B065E)
 
 @Composable
 fun MainMenuScreen(
+    sessionId: String,
     onCodeSlasherClick: () -> Unit,
     onLaRazaRunClick: () -> Unit,
     onCatchGameClick: () -> Unit,
@@ -95,8 +97,28 @@ fun MainMenuScreen(
                 color = Color.White.copy(alpha = 0.55f),
                 fontSize = 13.sp,
                 letterSpacing = 1.sp,
-                modifier = Modifier.padding(top = 6.dp, bottom = 32.dp)
+                modifier = Modifier.padding(top = 6.dp)
             )
+
+            // Session ID chip
+            if (sessionId.isNotBlank()) {
+                Spacer(modifier = Modifier.height(10.dp))
+                Surface(
+                    color = DarkCard.copy(alpha = 0.85f),
+                    shape = RoundedCornerShape(6.dp),
+                    border = BorderStroke(1.dp, NeonCyan.copy(alpha = 0.35f))
+                ) {
+                    Text(
+                        text = "SESSION_ID: $sessionId",
+                        fontFamily = FontFamily.Monospace,
+                        fontSize = 10.sp,
+                        color = NeonCyan.copy(alpha = 0.75f),
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
 
             GameCard(
                 title = "CODE SLASHER",
