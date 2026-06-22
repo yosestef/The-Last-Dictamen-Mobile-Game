@@ -1,0 +1,62 @@
+Prompt: Desarrollo y Refactorización de "CODE MERGE" (MVI + Physics Canvas)
+Contexto del Proyecto: Te encuentras en la raíz de un proyecto Android multijuego. Ya existen razarun y fruitninja (Code Slasher) y The last dictamen. Tu misión es refactorizar el paquete fruitmerge para convertirlo en el juego final: "Code Merge".
+
+Recueda que no debes implementar el backend real hasta que este primero el front y el back mockeado funcionando sin errores, asi como que yo debere autorizarte seguir con el backend
+
+1. Misión Técnica: Frontend Modular (MVI)
+Refactorizar el juego tipo "Suika" bajo el nombre Code Merge. El código debe estar aislado en com.android.mobile.games.app.games.codemerge.
+A. Capa de Datos y Contratos (Preparación para FastAPI)
+1.
+Modelos: Crear MergeRunResult (id, playerName, score, timestamp).
+2.
+Interfaz de Servicio: Definir ICodeMergeGameService con saveResult y getHighScores.
+3.
+Mock Service: Implementar MockCodeMergeGameService. RESTRICCIÓN: Los datos solo deben vivir en una mutableList en memoria. Usa delay(500L) en las funciones suspend para simular latencia de red.
+B. Motor de Física y Lógica (Canvas)
+Implementar un Game Loop con withFrameMillis en el ViewModel:
+1.
+Jerarquía de Fusión (Sprites Sólidos):
+◦
+Nivel 1: nulo.png (Base) -> Fusionar p/ Nivel 2 (+10 pts).
+◦
+Nivel 2: bug.png -> Fusionar p/ Nivel 3 (+20 pts).
+◦
+Nivel 3: error.png -> Fusionar p/ Nivel 4 (+30 pts).
+◦
+Nivel 4: ipn_card.png -> Fusionar p/ Nivel 5 (+40 pts).
+◦
+Nivel 5: cafe_con_vida.png -> Fusionar p/ Nivel 6 (+50 pts).
+◦
+Nivel 6 (Final): proyecto_compilado.png (Laptop neón) -> (+100 pts, no se fusiona más). Nota: El tamaño del radio debe aumentar un 20% por cada nivel.
+2.
+Físicas Básicas:
+◦
+Gravedad: Caída vertical constante.
+◦
+Colisión: Al tocarse dos elementos del mismo nivel, eliminarlos y spawnear el siguiente nivel en el punto medio.
+◦
+Línea de Pérdida (Loss Line): Línea lila neón en la parte superior. Si un elemento la toca por más de 1.5 segundos -> isGameOver = true.
+2. Especificaciones de UI (Jetpack Compose)
+1.
+Input: PointerInput para mover el ítem actual horizontalmente y soltarlo al levantar el dedo.
+2.
+HUD Lila: Seguir la estética de Code Slasher. Mostrar "PUNTAJE", "RECORD" y un recuadro de "SIGUIENTE" (solo niveles 1 al 3 pueden aparecer en cola).
+3.
+Efectos: Al fusionar, generar una explosión de partículas lilas y blancas (estrellitas) similar a la de los otros juegos.
+3. Integración y Seguridad (QA)
+1.
+Navegación: Actualizar AppNavigation y AppRoute para que FruitMerge ahora sea CodeMerge.
+2.
+Menú Principal: El botón de "Suika Merge" en MainMenuScreen debe renombrarse a "💻 Code Merge 🚀" y su descripción a "¡Fusiona el código hasta compilar tu proyecto final!".
+3.
+Cero Regresiones: Está terminantemente prohibido modificar archivos dentro de los paquetes razarun o fruitninja.
+4. Flujo de Trabajo
+1.
+Paso 1: Definir entidades de datos y el Mock Service.
+2.
+Paso 2: Implementar la lógica de colisiones circulares y fusión en el ViewModel.
+3.
+Paso 3: Desarrollar el Canvas con el sistema de coordenadas adaptado a pantallas horizontales.
+4.
+Paso 4: Realizar prueba de regresión: Verificar que Code Slasher y La Raza Run sigan funcionando perfectamente.
+Inicia el Paso 1 creando los contratos de datos en el nuevo paquete codemerge.

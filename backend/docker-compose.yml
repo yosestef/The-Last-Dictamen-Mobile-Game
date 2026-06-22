@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  api_codeslasher:
+    build: ./codeslasher
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=${CODESLASHER_DB_URL}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: on-failure
+
+  api_razarun:
+    build: ./razarun
+    ports:
+      - "8001:8000"
+    environment:
+      - DATABASE_URL=${RAZARUN_DB_URL}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: on-failure
+
+  api_codemerge:
+    build: ./codemerge
+    ports:
+      - "8002:8000"
+    environment:
+      - DATABASE_URL=${CODEMERGE_DB_URL}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: on-failure
+
+  api_lastdictamen:
+    build: ./lastdictamen
+    ports:
+      - "8003:8000"
+    environment:
+      - DATABASE_URL=${LASTDICTAMEN_DB_URL}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: on-failure
+
+volumes:
+  mysql_data:

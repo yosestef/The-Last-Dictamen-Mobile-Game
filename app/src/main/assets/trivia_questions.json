@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1,
+    "category": "GEOGRAPHY",
+    "question": "¿Cuál es la capital de México?",
+    "options": ["Guadalajara", "Monterrey", "Ciudad de México", "Puebla"],
+    "correctAnswerIndex": 2
+  },
+  {
+    "id": 2,
+    "category": "MATH",
+    "question": "¿Cuánto es 7 x 8?",
+    "options": ["54", "56", "64", "48"],
+    "correctAnswerIndex": 1
+  },
+  {
+    "id": 3,
+    "category": "SCIENCE",
+    "question": "¿Qué planeta es conocido como el planeta rojo?",
+    "options": ["Venus", "Marte", "Júpiter", "Saturno"],
+    "correctAnswerIndex": 1
+  },
+  {
+    "id": 4,
+    "category": "GEOGRAPHY",
+    "question": "¿Cuál es el océano más grande del mundo?",
+    "options": ["Atlántico", "Pacífico", "Índico", "Ártico"],
+    "correctAnswerIndex": 1
+  },
+  {
+    "id": 5,
+    "category": "MATH",
+    "question": "¿Cuál es el resultado de 15 + 27?",
+    "options": ["42", "41", "43", "40"],
+    "correctAnswerIndex": 0
+  },
+  {
+    "id": 6,
+    "category": "SCIENCE",
+    "question": "¿Qué gas respiramos principalmente para vivir?",
+    "options": ["Nitrógeno", "Hidrógeno", "Oxígeno", "Helio"],
+    "correctAnswerIndex": 2
+  },
+  {
+    "id": 7,
+    "category": "HISTORY",
+    "question": "¿En qué año comenzó la Independencia de México?",
+    "options": ["1810", "1821", "1910", "1857"],
+    "correctAnswerIndex": 0
+  },
+  {
+    "id": 8,
+    "category": "HISTORY",
+    "question": "¿Quién fue el primer presidente de México?",
+    "options": ["Benito Juárez", "Guadalupe Victoria", "Porfirio Díaz", "Ignacio Allende"],
+    "correctAnswerIndex": 1
+  }
+]

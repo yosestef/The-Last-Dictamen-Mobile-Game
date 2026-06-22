@@ -1,0 +1,67 @@
+CODE SLASHER---
+
+Objetivo: Analizar el código actual de un juego en desarrollo y adaptarlo al diseño y mecánicas de "Code Slasher" utilizando Kotlin, Jetpack Compose (Canvas) y arquitectura MVI.
+
+
+1. Análisis de Estructura Actual:
+
+Por favor, revisa mi código actual. Identifica cómo manejas el Game Loop (withFrameMillis), la lista de objetos y el estado de la UI.
+
+Asegúrate de mantener la arquitectura MVI, separando claramente los Intents (acciones del usuario), el State (datos del juego) y el ViewModel.
+
+2. Adaptación Estética (Assets y UI):
+
+Portada de inicio de juego donde se selecciona el modo etc: portada_slash.png
+
+Fondo: Usa fondo_lab_slash.png como fondo estático con un tinte lila suave.
+
+Ítems: Implementa los sprites bug.png, error.png, null.png, cafe_tachado.png e ipn_card.png
+
+los ítems cortados son los siguientes, su nombre indica cual parte es la de la derecha y cual la izquierda:
+null_der.png, null_izq.png, ipn_card_der.png, ipn_card_izq.png, bug_der.png, bug_izq.png, cafe_tachado_der.png, cafe_tachado_izq.png, error_der.png, error_izq.png
+
+HUD (Diseño 2): Implementa la barra superior lila con:
+
+Puntaje: Fuente pixel blanca con brillo. dice "PUNTAJE: ######"
+
+Temporizador: Barra rosa neón que se vacía. dice "TIEMPO: ##:##"
+
+Vidas: Iconos de vasos de café (se vuelven grises al perder vida). Cuando se tiene vida el café correspondiente es la imagen cafe_con_vida.png y cuando se pierde una vida el café se vuelve cafe_menos_vida.png
+Toma de referencia el como debe de verse la imagen portada_slash.png
+
+Rastro: Al deslizar (pointerInput), genera una estela blanco-lila neón con partículas.
+
+3. Lógica de Modos de Juego (Diferenciación Coherente):
+Asegúrate de que el ViewModel maneje estos tres estados de forma independiente:
+
+Modo Clásico: Sin temporizador. Ítems infinitos. Se pierde si caen 3 ítems o si se corta el café (cafe_tachado.png).
+
+Salvar el Semestre: Temporizador de 60s + Sistema de 3 vidas. Termina por tiempo o por perder vidas. Incluye bonus especiales.
+
+Modo Relax: Temporizador de 90s. Sin ítems de penalización (café). No se pierden vidas por caída de ítems. Foco en combos y relajación.
+
+Importante: asegúrate de que el contador de vidas se reinicie correctamente al cambiar de modo.
+
+4. Interfaz y Modales:
+
+Implementa la Pantalla de Inicio (portada_slash.png hecha realidad) con el panel de instrucciones detallado y el botón brillante "[ ¡A COMPILAR! ]".
+
+Configura el botón ? para mostrar el modal con el objetivo de la misión ("Código Limpio") y los consejos de "¡EXENTO!".
+
+Implementa la Pantalla de Resultados (Dictamen Final) con estadísticas de bugs eliminados y mejor combo.
+
+5. Preparación para Integración y Docker:
+
+Utiliza la clase FakeGameService para simular los rankings y datos del usuario mientras preparamos el backend en FastAPI.
+
+Asegúrate de que el código sea modular para que el cambio a un RetrofitGameService sea inmediato.
+
+Mantén la configuración limpia para facilitar la posterior dockerización del entorno de desarrollo.
+
+¿Puedes empezar analizando mi archivo GameViewModel.kt y GameCanvas.kt para ver cómo integramos estos cambios?
+
+Ahora una vez hecho eso necesito que comencemos con al backend, se realizara utilizando Fast-Api, mysql y lo que tenemos ya preparado para
+
+realizar el backend a partir de la tiene Persistencia Local con un Servicio Mockeado.
+
+

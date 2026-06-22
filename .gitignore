@@ -1,0 +1,71 @@
+# --- ANDROID & KOTLIN
+*. iml
+. gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+/.idea/deploymentTargetSelector.xml
+/.idea/inspectionProfiles/
+.idea/
+/build
+/captures
+.externalNativeBuild
+. CXX
+*. apk
+*. aab
+
+# ---
+__ pycache_
+*. py[cod]
+*$py.class
+venv/
+. venv/
+. env
+backend/ . env
+** / __ pycache
+
+# --- DOCKER & DB
+mysql_data/
+db_data/
+.docker-compose. Un~
+
+OS JUNK
+. DS_Store
+Thumbs. db
+desktop.ini
+
+# --- PROJECT SPECIFIC
+CodeSlasherPrompt. txt
+La Raza Run.txt
+prompt lastdictamen.md
+
+# -
+cat >> .gitignore << 'EOF'
+
+# Gradle
+.gradle/
+*.lock
+gradle-daemon-jvm.properties
+
+# Kotlin
+.kotlin/
+*.log
+
+# Backend secrets
+backend/.env
+*.env
+*.env.local
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+EOF
