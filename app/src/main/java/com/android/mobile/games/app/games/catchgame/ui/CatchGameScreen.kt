@@ -33,6 +33,7 @@ import com.android.mobile.games.app.games.catchgame.data.TriviaRepository
 import com.android.mobile.games.app.games.catchgame.engine.CatchGameController
 import com.android.mobile.games.app.games.catchgame.data.ICatchGameService
 import com.android.mobile.games.app.games.catchgame.model.CatchGameDifficulty
+import com.android.mobile.games.app.identity.IdentityManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -46,12 +47,12 @@ import com.android.mobile.games.app.ui.util.HideSystemBars
 @Composable
 fun CatchGameScreen(
     difficulty: CatchGameDifficulty,
-    username: String,
     gameService: ICatchGameService,
     onBackToMenuClick: () -> Unit
 ) {
     HideSystemBars()
     val context = LocalContext.current
+    val identityManager = remember { IdentityManager.getInstance(context) }
     val density = LocalDensity.current
     val coroutineScope = rememberCoroutineScope()
 
@@ -156,13 +157,11 @@ fun CatchGameScreen(
                 score = uiState.score
             )
             // 2. Envío al servidor — fallo silencioso si no hay red
-            if (username.isNotBlank()) {
-                gameService.submitScore(
-                    username = username,
-                    score = uiState.score,
-                    difficulty = difficulty.name
-                )
-            }
+            gameService.submitScore(
+                username = identityManager.programmerId,
+                score = uiState.score,
+                difficulty = difficulty.name
+            )
         }
     }
 

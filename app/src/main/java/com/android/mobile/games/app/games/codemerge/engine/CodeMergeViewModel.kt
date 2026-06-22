@@ -16,10 +16,11 @@ import kotlin.math.sqrt
 import kotlin.random.Random
 
 class CodeMergeViewModel(
-    private val service: ICodeMergeGameService
+    private val service: ICodeMergeGameService,
+    private val programmerId: String = "ANON"
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(CodeMergeGameState())
+    private val _state = MutableStateFlow(CodeMergeGameState(playerName = programmerId))
     val state: StateFlow<CodeMergeGameState> = _state.asStateFlow()
 
     private val GRAVITY = 0.4f
@@ -266,7 +267,7 @@ class CodeMergeViewModel(
     private fun submitScore(name: String) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            service.saveResult(MergeRunResult(playerName = name, score = _state.value.currentScore))
+            service.saveResult(MergeRunResult(playerName = programmerId, score = _state.value.currentScore))
             _state.update { it.copy(isLoading = false) }
         }
     }
