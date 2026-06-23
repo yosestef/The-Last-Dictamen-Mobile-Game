@@ -31,17 +31,20 @@ import kotlinx.coroutines.launch
 fun CatchGameMenuScreen(
     selectedDifficulty: CatchGameDifficulty,
     onDifficultySelected: (CatchGameDifficulty) -> Unit,
-    onStartGameClick: () -> Unit,
+    onStartGameClick: (username: String) -> Unit,
     onBackClick: () -> Unit,
     rankingLoader: suspend (difficulty: String?, limit: Int) -> List<CatchGameRankingEntry>
 ) {
     HideSystemBars()
+    var username by remember { mutableStateOf("") }
     var showRankingModal by remember { mutableStateOf(false) }
     var rankingData by remember { mutableStateOf<List<CatchGameRankingEntry>>(emptyList()) }
     var isLoadingRanking by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
         Image(
             painter = painterResource(id = R.drawable.bg_menu),
             contentDescription = null,
@@ -55,6 +58,7 @@ fun CatchGameMenuScreen(
                 .background(CutePink.copy(alpha = 0.15f))
         )
 
+        // Botón Ranking (top-right)
         IconButton(
             onClick = {
                 showRankingModal = true
@@ -115,8 +119,32 @@ fun CatchGameMenuScreen(
                         color = TextDark.copy(alpha = 0.7f),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(bottom = 20.dp)
+                        modifier = Modifier.padding(bottom = 16.dp)
                     )
+
+                    // Campo de nombre del jugador
+                    OutlinedTextField(
+                        value = username,
+                        onValueChange = { username = it },
+                        label = { Text("Tu nombre de estudiante", color = TextDark.copy(alpha = 0.7f)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        textStyle = androidx.compose.ui.text.TextStyle(
+                            color = TextDark,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 16.sp
+                        ),
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = CutePink,
+                            unfocusedBorderColor = CutePink.copy(alpha = 0.5f),
+                            cursorColor = CutePink,
+                            focusedLabelColor = CutePink,
+                            unfocusedLabelColor = TextDark.copy(alpha = 0.5f)
+                        ),
+                        shape = RoundedCornerShape(16.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -148,10 +176,12 @@ fun CatchGameMenuScreen(
                     Spacer(modifier = Modifier.height(28.dp))
 
                     Button(
-                        onClick = onStartGameClick,
+                        onClick = { onStartGameClick(username.trim()) },
+                        enabled = username.isNotBlank(),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = CutePink,
-                            contentColor = TextDark
+                            contentColor = TextDark,
+                            disabledContainerColor = Color.LightGray
                         ),
                         shape = RoundedCornerShape(18.dp),
                         modifier = Modifier
@@ -179,6 +209,7 @@ fun CatchGameMenuScreen(
             }
         }
 
+        // Modal de Ranking
         if (showRankingModal) {
             AlertDialog(
                 onDismissRequest = { showRankingModal = false },
@@ -213,7 +244,9 @@ fun CatchGameMenuScreen(
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
                                     val medal = when (index) {
-                                        0 -> "🥇 "; 1 -> "🥈 "; 2 -> "🥉 "
+                                        0 -> "🥇 "
+                                        1 -> "🥈 "
+                                        2 -> "🥉 "
                                         else -> "${index + 1}. "
                                     }
                                     Text(

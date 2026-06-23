@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,11 +27,12 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun FruitNinjaMenuScreen(
-    onStartGameClick: (FruitNinjaDifficulty) -> Unit,
+    onStartGameClick: (FruitNinjaDifficulty, String) -> Unit,
     onBackClick: () -> Unit
 ) {
     HideSystemBars()
     var selectedDifficulty by remember { mutableStateOf(FruitNinjaDifficulty.SAVE_SEMESTER) }
+    var username by remember { mutableStateOf("") }
     var showHelpModal by remember { mutableStateOf(false) }
     var showRankingModal by remember { mutableStateOf(false) }
     var rankingData by remember { mutableStateOf<List<Pair<String, Int>>>(emptyList()) }
@@ -40,6 +42,7 @@ fun FruitNinjaMenuScreen(
     val coroutineScope = rememberCoroutineScope()
 
     Box(modifier = Modifier.fillMaxSize()) {
+        // 1. FONDO DE PORTADA
         Image(
             painter = painterResource(id = R.drawable.portada_slash),
             contentDescription = null,
@@ -47,12 +50,14 @@ fun FruitNinjaMenuScreen(
             contentScale = ContentScale.Crop
         )
 
+        // 2. BOTONES SUPERIORES (AYUDA Y RANKING)
         Row(
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(24.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Botón Ranking
             IconButton(
                 onClick = {
                     showRankingModal = true
@@ -77,6 +82,7 @@ fun FruitNinjaMenuScreen(
 
             Spacer(modifier = Modifier.width(16.dp))
 
+            // Botón Ayuda
             IconButton(
                 onClick = { showHelpModal = true },
                 modifier = Modifier.size(56.dp)
@@ -93,6 +99,7 @@ fun FruitNinjaMenuScreen(
             }
         }
 
+        // 3. PANEL DE CONTROL (Super cute glassmorphic pink)
         Surface(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -110,9 +117,34 @@ fun FruitNinjaMenuScreen(
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = TextDark,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    modifier = Modifier.padding(bottom = 12.dp)
                 )
 
+                // Campo de Nombre de Usuario
+                OutlinedTextField(
+                    value = username,
+                    onValueChange = { username = it },
+                    label = { Text("Nombre del programador", color = TextDark.copy(alpha = 0.7f)) },
+                    modifier = Modifier.fillMaxWidth(0.85f),
+                    textStyle = androidx.compose.ui.text.TextStyle(
+                        color = TextDark,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 16.sp
+                    ),
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = CutePink,
+                        unfocusedBorderColor = CutePink.copy(alpha = 0.5f),
+                        cursorColor = CutePink,
+                        focusedLabelColor = CutePink,
+                        unfocusedLabelColor = TextDark.copy(alpha = 0.5f)
+                    ),
+                    shape = RoundedCornerShape(16.dp)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Selector de Modos
                 ModeSelectorRow(
                     selected = selectedDifficulty,
                     onSelected = { selectedDifficulty = it }
@@ -120,13 +152,20 @@ fun FruitNinjaMenuScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
+                // Botón Principal
                 Button(
-                    onClick = { onStartGameClick(selectedDifficulty) },
+                    onClick = { 
+                        if (username.isNotBlank()) {
+                            onStartGameClick(selectedDifficulty, username) 
+                        }
+                    },
+                    enabled = username.isNotBlank(),
                     modifier = Modifier
                         .fillMaxWidth(0.9f)
                         .height(56.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = CutePink,
+                        disabledContainerColor = Color.LightGray,
                         contentColor = TextDark
                     ),
                     shape = RoundedCornerShape(18.dp),
@@ -143,6 +182,7 @@ fun FruitNinjaMenuScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
+                // BOTÓN CERRAR LAB
                 OutlinedButton(
                     onClick = onBackClick,
                     modifier = Modifier.fillMaxWidth(0.7f),
@@ -161,6 +201,7 @@ fun FruitNinjaMenuScreen(
             }
         }
 
+        // Modal de Ranking
         if (showRankingModal) {
             AlertDialog(
                 onDismissRequest = { showRankingModal = false },
@@ -178,8 +219,10 @@ fun FruitNinjaMenuScreen(
                                     modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
-                                    val emoji = when (index) {
-                                        0 -> "🥇 "; 1 -> "🥈 "; 2 -> "🥉 "
+                                    val emoji = when(index) {
+                                        0 -> "🥇 "
+                                        1 -> "🥈 "
+                                        2 -> "🥉 "
                                         else -> "${index + 1}. "
                                     }
                                     Text(text = "$emoji${pair.first}", color = TextDark, fontWeight = FontWeight.SemiBold)
@@ -198,6 +241,7 @@ fun FruitNinjaMenuScreen(
             )
         }
 
+        // 4. MODAL DE AYUDA
         if (showHelpModal) {
             AlertDialog(
                 onDismissRequest = { showHelpModal = false },
@@ -239,7 +283,7 @@ private fun ModeSelectorRow(
                 onClick = { onSelected(mode) },
                 label = {
                     Text(
-                        text = when (mode) {
+                        text = when(mode) {
                             FruitNinjaDifficulty.CLASSIC -> "🍭 " + mode.label
                             FruitNinjaDifficulty.SAVE_SEMESTER -> "📚 " + mode.label
                             FruitNinjaDifficulty.RELAX -> "☕ " + mode.label

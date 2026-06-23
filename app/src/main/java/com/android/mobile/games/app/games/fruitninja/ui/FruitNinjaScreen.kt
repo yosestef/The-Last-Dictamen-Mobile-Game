@@ -22,17 +22,16 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 import com.android.mobile.games.app.games.fruitninja.data.RetrofitGameService
-import com.android.mobile.games.app.identity.IdentityManager
 import com.android.mobile.games.app.ui.util.HideSystemBars
 
 @Composable
 fun FruitNinjaScreen(
     difficulty: FruitNinjaDifficulty,
+    username: String,
     onBackToMenuClick: () -> Unit
 ) {
     HideSystemBars()
     val context = LocalContext.current
-    val identityManager = remember { IdentityManager.getInstance(context) }
     val coroutineScope = rememberCoroutineScope()
 
     val scoreRepository = remember {
@@ -108,7 +107,7 @@ fun FruitNinjaScreen(
                 score = gameState.score
             )
             gameService.uploadScore(
-                username = identityManager.programmerId,
+                username = username,
                 score = gameState.score,
                 difficulty = difficulty.name
             )
