@@ -1,7 +1,7 @@
 package com.android.mobile.games.app.games.razarun.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -44,12 +44,26 @@ fun RazaScreen(
             .fillMaxSize()
             .background(Color.Black)
             .pointerInput(Unit) {
-                detectDragGestures { change, dragAmount ->
-                    change.consume()
-                    if (dragAmount.y < -50) {
-                        engine.jump()
-                    } else if (dragAmount.y > 50) {
-                        engine.slide()
+                // awaitPointerEventScope provee AwaitPointerEventScope como receiver:
+                // awaitFirstDown y awaitPointerEvent son miembros, no requieren import extra
+                awaitPointerEventScope {
+                    while (true) {
+                        awaitFirstDown(requireUnconsumed = false)
+                        var accumulated = 0f
+                        var fired = false
+                        while (true) {
+                            val event = awaitPointerEvent()
+                            val change = event.changes.firstOrNull() ?: break
+                            if (!change.pressed) break
+                            accumulated += change.position.y - change.previousPosition.y
+                            change.consume()
+                            if (!fired) {
+                                when {
+                                    accumulated < -20f -> { engine.jump();  fired = true }
+                                    accumulated >  20f -> { engine.slide(); fired = true }
+                                }
+                            }
+                        }
                     }
                 }
             }

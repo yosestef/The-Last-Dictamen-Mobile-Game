@@ -114,7 +114,7 @@ fun MainMenuScreen(
             GameCard(
                 title = "LA RAZA RUN",
                 emoji = "🏃",
-                iconRes = R.drawable.raza_correr5,
+                iconRes = R.drawable.correr_raza1,
                 description = "Corre por el Transbordo de la Ciencia antes de que el tiempo se agote",
                 accentColor = Color(0xFFFF5252),
                 onClick = onLaRazaRunClick
