@@ -21,6 +21,7 @@ import com.android.mobile.games.app.games.catchgame.ui.CatchGameScreen
 import com.android.mobile.games.app.games.codemerge.data.MockCodeMergeGameService
 import com.android.mobile.games.app.games.codemerge.engine.CodeMergeViewModel
 import com.android.mobile.games.app.games.codemerge.ui.CodeMergeScreen
+import com.android.mobile.games.app.games.fruitninja.data.RetrofitGameService
 import com.android.mobile.games.app.games.fruitninja.model.FruitNinjaDifficulty
 import com.android.mobile.games.app.games.fruitninja.ui.FruitNinjaMenuScreen
 import com.android.mobile.games.app.games.fruitninja.ui.FruitNinjaScreen
@@ -46,6 +47,7 @@ fun AppNavigation() {
 
     val codeMergeService = remember { MockCodeMergeGameService() }
     val catchGameService: ICatchGameService = remember { RetrofitCatchGameService() }
+    val fruitNinjaGameService = remember { RetrofitGameService() }
 
     NavHost(
         navController = navController,
@@ -184,6 +186,7 @@ fun AppNavigation() {
 
             FruitNinjaScreen(
                 difficulty = difficulty,
+                gameService = fruitNinjaGameService,
                 onBackToMenuClick = {
                     navController.popBackStack()
                 }

@@ -42,6 +42,7 @@ import kotlin.math.roundToInt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import com.android.mobile.games.app.games.catchgame.model.TriviaQuestion
+import android.util.Log
 import com.android.mobile.games.app.ui.util.HideSystemBars
 
 @Composable
@@ -157,8 +158,10 @@ fun CatchGameScreen(
                 score = uiState.score
             )
             // 2. Envío al servidor — fallo silencioso si no hay red
+            val id = identityManager.programmerId
+            Log.d("QA-IDENTITY", "CatchGame: enviando puntaje — id=$id score=${uiState.score} difficulty=${difficulty.name}")
             gameService.submitScore(
-                username = identityManager.programmerId,
+                username = id,
                 score = uiState.score,
                 difficulty = difficulty.name
             )

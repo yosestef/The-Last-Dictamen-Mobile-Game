@@ -1,6 +1,7 @@
 package com.android.mobile.games.app.identity
 
 import android.content.Context
+import android.provider.Settings
 import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -11,10 +12,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import java.util.UUID
 
 private val Context.identityDataStore: DataStore<Preferences> by preferencesDataStore(name = "identity_prefs")
 
-class IdentityManager private constructor(context: Context) {
+class IdentityManager private constructor(private val context: Context) {
 
     companion object {
         @Volatile
@@ -62,7 +64,7 @@ class IdentityManager private constructor(context: Context) {
             return existing
         }
 
-        val newId = "PROG-${generateSuffix()}"
+        val newId = "PROG-${generateSuffix(context)}"
         val newSession = IdentitySession(newId, AuthProvider.ANONIMO)
 
         dataStore.edit { mutablePrefs ->
@@ -75,9 +77,16 @@ class IdentityManager private constructor(context: Context) {
         return newSession
     }
 
-    private fun generateSuffix(): String {
+    private fun generateSuffix(context: Context): String {
+        val androidId = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
+        // ANDROID_ID puede ser null o el valor genérico de emuladores; en ese caso usamos UUID
+        val seed = if (androidId.isNullOrBlank() || androidId == "9774d56d682e549c") {
+            UUID.randomUUID().toString()
+        } else {
+            androidId
+        }
         val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-        return (1..6).map { chars.random() }.joinToString("")
+        return seed.filter { it.isLetterOrDigit() }.uppercase().take(6).padEnd(6, chars.random())
     }
 
     // Supabase Ready: placeholder para vincular cuenta anónima con cuenta real

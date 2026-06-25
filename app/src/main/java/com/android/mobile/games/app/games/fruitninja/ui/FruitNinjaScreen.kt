@@ -1,5 +1,6 @@
 package com.android.mobile.games.app.games.fruitninja.ui
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -15,19 +16,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.android.mobile.games.app.games.fruitninja.data.FruitNinjaScoreRepository
+import com.android.mobile.games.app.games.fruitninja.data.GameService
 import com.android.mobile.games.app.games.fruitninja.engine.FruitNinjaGameEngine
 import com.android.mobile.games.app.games.fruitninja.model.FruitNinjaDifficulty
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
-import com.android.mobile.games.app.games.fruitninja.data.RetrofitGameService
 import com.android.mobile.games.app.identity.IdentityManager
 import com.android.mobile.games.app.ui.util.HideSystemBars
 
 @Composable
 fun FruitNinjaScreen(
     difficulty: FruitNinjaDifficulty,
+    gameService: GameService,
     onBackToMenuClick: () -> Unit
 ) {
     HideSystemBars()
@@ -37,10 +39,6 @@ fun FruitNinjaScreen(
 
     val scoreRepository = remember {
         FruitNinjaScoreRepository(context = context)
-    }
-
-    val gameService = remember {
-        RetrofitGameService()
     }
 
     val bestScore by scoreRepository
@@ -107,8 +105,10 @@ fun FruitNinjaScreen(
                 difficulty = difficulty,
                 score = gameState.score
             )
+            val id = identityManager.programmerId
+            Log.d("QA-IDENTITY", "CodeSlasher: enviando puntaje — id=$id score=${gameState.score} difficulty=${difficulty.name}")
             gameService.uploadScore(
-                username = identityManager.programmerId,
+                username = id,
                 score = gameState.score,
                 difficulty = difficulty.name
             )
