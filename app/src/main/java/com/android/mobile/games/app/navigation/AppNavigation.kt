@@ -40,9 +40,6 @@ fun AppNavigation() {
     val context = LocalContext.current
     val identityManager = remember { IdentityManager.getInstance(context) }
 
-    val session by identityManager.session.collectAsState()
-    val currentProgrammerId = session?.programmerId ?: ""
-
     var catchGameDifficulty by remember { mutableStateOf(CatchGameDifficulty.EASY) }
 
     val codeMergeService = remember { MockCodeMergeGameService() }
@@ -74,7 +71,6 @@ fun AppNavigation() {
 
         composable(AppRoute.MainMenu.route) {
             MainMenuScreen(
-                sessionId = currentProgrammerId,
                 onCodeSlasherClick = {
                     navController.navigate(AppRoute.FruitNinjaMenu.route)
                 },
@@ -142,7 +138,7 @@ fun AppNavigation() {
                 factory = object : androidx.lifecycle.ViewModelProvider.Factory {
                     override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
                         @Suppress("UNCHECKED_CAST")
-                        return CodeMergeViewModel(codeMergeService, currentProgrammerId) as T
+                        return CodeMergeViewModel(codeMergeService, identityManager.programmerId) as T
                     }
                 }
             )

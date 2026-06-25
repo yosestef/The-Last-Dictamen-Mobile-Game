@@ -112,7 +112,7 @@ fun AuthScreen(
                     TerminalBlink(message = "Verificando credenciales del sistema...")
 
                 is AuthViewModel.AuthState.SessionExists ->
-                    SplashPanel(programmerId = s.programmerId)
+                    SplashPanel()
 
                 is AuthViewModel.AuthState.NewUser ->
                     LoginPanel(onGuestClick = { viewModel.continueAsGuest() })
@@ -160,15 +160,15 @@ private fun TerminalBlink(message: String) {
 }
 
 @Composable
-private fun SplashPanel(programmerId: String) {
+private fun SplashPanel() {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
-            text = "> Sesión detectada.",
+            text = "> Sincronización Completa.",
             style = TextStyle(fontFamily = FontFamily.Monospace, fontSize = 14.sp, color = AuthTerminalGreen)
         )
         Spacer(modifier = Modifier.height(6.dp))
         Text(
-            text = "> Cargando perfil: $programmerId",
+            text = "> Acceso Autorizado. Iniciando Arcade...",
             style = TextStyle(fontFamily = FontFamily.Monospace, fontSize = 13.sp, color = AuthNeonCyan)
         )
         Spacer(modifier = Modifier.height(20.dp))
@@ -263,7 +263,7 @@ private fun LoginPanel(onGuestClick: () -> Unit) {
         }
 
         Text(
-            text = "Google y Correo disponibles próximamente (Supabase)",
+            text = "Google y Correo próximamente (Firebase Authentication)",
             fontFamily = FontFamily.Monospace,
             fontSize = 10.sp,
             color = Color.White.copy(alpha = 0.25f)
@@ -273,7 +273,7 @@ private fun LoginPanel(onGuestClick: () -> Unit) {
 
 @Composable
 private fun TerminalSuccess(programmerId: String) {
-    val fullText = "Asignando Credenciales de Acceso...\nID: $programmerId GENERADO.\nBienvenido al Arcade."
+    val fullText = "Sincronizando con Firebase...\nAcceso Autorizado.\nBienvenido al Arcade."
     var displayed by remember { mutableStateOf("") }
 
     LaunchedEffect(programmerId) {

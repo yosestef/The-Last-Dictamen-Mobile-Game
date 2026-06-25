@@ -159,9 +159,15 @@ fun CatchGameScreen(
             )
             // 2. Envío al servidor — fallo silencioso si no hay red
             val id = identityManager.programmerId
-            Log.d("QA-IDENTITY", "CatchGame: enviando puntaje — id=$id score=${uiState.score} difficulty=${difficulty.name}")
+            Log.d("QA-FIREBASE", "CatchGame: enviando puntaje — id=$id score=${uiState.score} difficulty=${difficulty.name}")
             gameService.submitScore(
                 username = id,
+                score = uiState.score,
+                difficulty = difficulty.name
+            )
+            // 3. Sync a Firestore (silencioso si Firebase no está configurado)
+            identityManager.syncWithCloud(
+                collection = "scores_catch",
                 score = uiState.score,
                 difficulty = difficulty.name
             )

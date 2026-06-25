@@ -106,9 +106,15 @@ fun FruitNinjaScreen(
                 score = gameState.score
             )
             val id = identityManager.programmerId
-            Log.d("QA-IDENTITY", "CodeSlasher: enviando puntaje — id=$id score=${gameState.score} difficulty=${difficulty.name}")
+            Log.d("QA-FIREBASE", "CodeSlasher: enviando puntaje — id=$id score=${gameState.score} difficulty=${difficulty.name}")
             gameService.uploadScore(
                 username = id,
+                score = gameState.score,
+                difficulty = difficulty.name
+            )
+            // Sync a Firestore (silencioso si Firebase no está configurado)
+            identityManager.syncWithCloud(
+                collection = "scores_slasher",
                 score = gameState.score,
                 difficulty = difficulty.name
             )

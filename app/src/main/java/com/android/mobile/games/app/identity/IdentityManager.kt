@@ -8,11 +8,16 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import java.util.UUID
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 private val Context.identityDataStore: DataStore<Preferences> by preferencesDataStore(name = "identity_prefs")
 
@@ -45,7 +50,7 @@ class IdentityManager private constructor(private val context: Context) {
             ?.let { runCatching { AuthProvider.valueOf(it) }.getOrDefault(AuthProvider.NINGUNO) }
             ?: AuthProvider.NINGUNO
         _session.value = IdentitySession(id, provider)
-        Log.d("QA-AUTH", "Active Identity initialized as $id via $provider")
+        Log.d("QA-FIREBASE", "Sesión local restaurada: $id via $provider")
     }
 
     fun hasSession(): Boolean = _session.value != null
@@ -60,7 +65,8 @@ class IdentityManager private constructor(private val context: Context) {
                 ?: AuthProvider.NINGUNO
             val existing = IdentitySession(existingId, provider)
             _session.value = existing
-            Log.d("QA-AUTH", "Active Identity initialized as $existingId via $provider")
+            Log.d("QA-FIREBASE", "Sesión local restaurada: $existingId via $provider")
+            signInFirebaseAnonymously()
             return existing
         }
 
@@ -73,8 +79,68 @@ class IdentityManager private constructor(private val context: Context) {
         }
 
         _session.value = newSession
-        Log.d("QA-AUTH", "Active Identity initialized as $newId via ${AuthProvider.ANONIMO}")
+        Log.d("QA-FIREBASE", "Identidad generada: $newId via ${AuthProvider.ANONIMO}")
+        signInFirebaseAnonymously()
         return newSession
+    }
+
+    private fun signInFirebaseAnonymously() {
+        runCatching {
+            if (FirebaseAuth.getInstance().currentUser != null) {
+                Log.d("QA-FIREBASE", "Firebase Auth: sesión activa ${FirebaseAuth.getInstance().currentUser?.uid}")
+                return
+            }
+            FirebaseAuth.getInstance().signInAnonymously()
+                .addOnSuccessListener { result ->
+                    Log.d("QA-FIREBASE", "Firebase Auth: inicio anónimo OK uid=${result.user?.uid}")
+                }
+                .addOnFailureListener { e ->
+                    Log.d("QA-FIREBASE", "Firebase Auth: no disponible (sin google-services.json?): ${e.message}")
+                }
+        }.onFailure {
+            Log.d("QA-FIREBASE", "Firebase Auth: SDK no inicializado: ${it.message}")
+        }
+    }
+
+    suspend fun syncWithCloud(collection: String, score: Int, difficulty: String) {
+        runCatching {
+            val uid = FirebaseAuth.getInstance().currentUser?.uid
+                ?: run {
+                    Log.d("QA-FIREBASE", "Firestore: sin uid Firebase, omitiendo sync")
+                    return
+                }
+            val document = mapOf(
+                "programmerId" to programmerId,
+                "uid" to uid,
+                "score" to score,
+                "difficulty" to difficulty,
+                "timestamp" to System.currentTimeMillis()
+            )
+            suspendCoroutine { cont ->
+                Firebase.firestore.collection(collection)
+                    .add(document)
+                    .addOnSuccessListener {
+                        Log.d("QA-FIREBASE", "Firestore sync OK: collection=$collection programmerId=$programmerId score=$score")
+                        cont.resume(Unit)
+                    }
+                    .addOnFailureListener { e ->
+                        Log.d("QA-FIREBASE", "Firestore sync failed: ${e.message}")
+                        cont.resume(Unit)
+                    }
+            }
+        }.onFailure {
+            Log.d("QA-FIREBASE", "Firebase Firestore: no disponible: ${it.message}")
+        }
+    }
+
+    fun linkAccount(provider: AuthProvider) {
+        runCatching {
+            when (provider) {
+                AuthProvider.GOOGLE -> Log.d("QA-FIREBASE", "Firebase Auth: Google Sign-In pendiente de configuración")
+                AuthProvider.CORREO -> Log.d("QA-FIREBASE", "Firebase Auth: Email Sign-In pendiente de configuración")
+                else -> Unit
+            }
+        }
     }
 
     private fun generateSuffix(context: Context): String {
@@ -87,16 +153,5 @@ class IdentityManager private constructor(private val context: Context) {
         }
         val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
         return seed.filter { it.isLetterOrDigit() }.uppercase().take(6).padEnd(6, chars.random())
-    }
-
-    // Supabase Ready: placeholder para vincular cuenta anónima con cuenta real
-    fun linkAccount(provider: AuthProvider) {
-        // TODO Supabase: cuando provider == GOOGLE → client.auth.signInWithOAuth(OAuthProvider.GOOGLE)
-        // TODO Supabase: cuando provider == CORREO  → client.auth.signUpWith(Email) { ... }
-    }
-
-    // Supabase Ready: placeholder para migrar datos de MySQL → Supabase PostgreSQL
-    fun syncWithCloud() {
-        // TODO Supabase: iterar scores locales y subirlos a las tablas de Supabase Database
     }
 }
